@@ -1,6 +1,6 @@
-require 'puppet/util/wpackage'
+require 'puppet/util/windows_package'
 
-module Puppet::Util::WPackage::Process
+module Puppet::Util::WindowsPackage::Process
   extend ::Windows::Process
   extend ::Windows::Handle
   extend ::Windows::Synchronize
@@ -17,7 +17,7 @@ module Puppet::Util::WPackage::Process
 
     exit_status = [0].pack('L')
     unless GetExitCodeProcess(handle, exit_status)
-      raise Puppet::Util::WPackage::Error.new("Failed to get child process exit code")
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to get child process exit code")
     end
     exit_status = exit_status.unpack('L').first
 

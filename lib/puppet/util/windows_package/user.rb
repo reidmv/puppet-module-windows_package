@@ -1,9 +1,9 @@
-require 'puppet/util/wpackage'
+require 'puppet/util/windows_package'
 
 require 'win32/security'
 require 'facter'
 
-module Puppet::Util::WPackage::User
+module Puppet::Util::WindowsPackage::User
   include ::Windows::Security
   extend ::Windows::Security
 
@@ -25,15 +25,15 @@ module Puppet::Util::WPackage::User
     member = 0.chr * 4
 
     unless CreateWellKnownSid(WinBuiltinAdministratorsSid, nil, sid, size)
-      raise Puppet::Util::WPackage::Error.new("Failed to create administrators SID")
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to create administrators SID")
     end
 
     unless IsValidSid(sid)
-      raise Puppet::Util::WPackage::Error.new("Invalid SID")
+      raise Puppet::Util::WindowsPackage::Error.new("Invalid SID")
     end
 
     unless CheckTokenMembership(nil, sid, member)
-      raise Puppet::Util::WPackage::Error.new("Failed to check membership")
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to check membership")
     end
 
     # Is administrators SID enabled in calling thread's access token?
@@ -44,7 +44,7 @@ module Puppet::Util::WPackage::User
   def password_is?(name, password)
     logon_user(name, password)
     true
-  rescue Puppet::Util::WPackage::Error => e
+  rescue Puppet::Util::WindowsPackage::Error => e
     false
   end
   module_function :password_is?
@@ -58,7 +58,7 @@ module Puppet::Util::WPackage::User
 
     token = 0.chr * 4
     if logon_user.call(name, ".", password, fLOGON32_LOGON_NETWORK, fLOGON32_PROVIDER_DEFAULT, token) == 0
-      raise Puppet::Util::WPackage::Error.new("Failed to logon user #{name.inspect}")
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to logon user #{name.inspect}")
     end
 
     begin
@@ -92,13 +92,13 @@ module Puppet::Util::WPackage::User
 
       # Load the profile. Since it doesn't exist, it will be created
       if load_user_profile.call(token, pi) == 0
-        raise Puppet::Util::WPackage::Error.new("Failed to load user profile #{user.inspect}")
+        raise Puppet::Util::WindowsPackage::Error.new("Failed to load user profile #{user.inspect}")
       end
 
       Puppet.debug("Loaded profile for #{user}")
 
       if unload_user_profile.call(token, pi.unpack('LLLLLLLL').last) == 0
-        raise Puppet::Util::WPackage::Error.new("Failed to unload user profile #{user.inspect}")
+        raise Puppet::Util::WindowsPackage::Error.new("Failed to unload user profile #{user.inspect}")
       end
     end
   end

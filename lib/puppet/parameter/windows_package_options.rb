@@ -1,6 +1,6 @@
 require 'puppet/parameter'
 
-class Puppet::Parameter::WPackageOptions < Puppet::Parameter
+class Puppet::Parameter::WindowsPackageOptions < Puppet::Parameter
   def unsafe_munge(values)
     values = [values] unless values.is_a? Array
 

@@ -1,4 +1,4 @@
-class Puppet::Provider::WPackage < Puppet::Provider
+class Puppet::Provider::WindowsPackage < Puppet::Provider
   # Prefetch our package list, yo.
   def self.prefetch(packages)
     instances.each do |prov|

@@ -3,10 +3,10 @@
 # This allows packages to exist on the same machine using different packaging
 # systems.
 
-require 'puppet/parameter/wpackage_options'
+require 'puppet/parameter/windows_package_options'
 
 module Puppet
-  newtype(:wpackage) do
+  newtype(:windows_package) do
     @doc = "Manage packages.  There is a basic dichotomy in package
       support right now:  Some package types (e.g., yum and apt) can
       retrieve their own package files, while others (e.g., rpm and sun)
@@ -298,7 +298,7 @@ module Puppet
         further specifications for which type of package you want."
     end
 
-    newparam(:install_options, :parent => Puppet::Parameter::WPackageOptions, :required_features => :install_options) do
+    newparam(:install_options, :parent => Puppet::Parameter::WindowsPackageOptions, :required_features => :install_options) do
       desc <<-EOT
         An array of additional options to pass when installing a package. These
         options are package-specific, and should be documented by the software
@@ -321,7 +321,7 @@ module Puppet
       EOT
     end
 
-    newparam(:uninstall_options, :parent => Puppet::Parameter::WPackageOptions, :required_features => :uninstall_options) do
+    newparam(:uninstall_options, :parent => Puppet::Parameter::WindowsPackageOptions, :required_features => :uninstall_options) do
       desc <<-EOT
         An array of additional options to pass when uninstalling a package. These
         options are package-specific, and should be documented by the software

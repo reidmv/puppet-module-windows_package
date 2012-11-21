@@ -1,6 +1,6 @@
-require 'puppet/util/wpackage'
+require 'puppet/util/windows_package'
 
-module Puppet::Util::WPackage
+module Puppet::Util::WindowsPackage
   module Registry
     # http://msdn.microsoft.com/en-us/library/windows/desktop/aa384129(v=vs.85).aspx
     KEY64 = 0x100
@@ -23,7 +23,7 @@ module Puppet::Util::WPackage
           return yield subkey
         end
       rescue Win32::Registry::Error => error
-        raise Puppet::Util::WPackage::Error.new("Failed to open registry key '#{hkey.keyname}\\#{path}'", error.code)
+        raise Puppet::Util::WindowsPackage::Error.new("Failed to open registry key '#{hkey.keyname}\\#{path}'", error.code)
       end
     end
 

@@ -1,7 +1,7 @@
-require 'puppet/util/wpackage'
+require 'puppet/util/windows_package'
 
 # represents an error resulting from a Win32 error code
-class Puppet::Util::WPackage::Error < Puppet::Error
+class Puppet::Util::WindowsPackage::Error < Puppet::Error
   require 'windows/error'
   include ::Windows::Error
 

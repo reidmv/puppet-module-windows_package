@@ -1,7 +1,7 @@
-require 'puppet/provider/wpackage/wpackage/package'
+require 'puppet/provider/windows_package/windows_package/package'
 
-class Puppet::Provider::Package::WPackage
-  class ExePackage < Puppet::Provider::Package::WPackage::Package
+class Puppet::Provider::Package::WindowsPackage
+  class ExePackage < Puppet::Provider::Package::WindowsPackage::Package
     attr_reader :uninstall_string
 
     # Return an instance of the package from the registry, or nil

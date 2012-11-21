@@ -1,6 +1,6 @@
-require 'puppet/util/wpackage'
+require 'puppet/util/windows_package'
 
-module Puppet::Util::WPackage
+module Puppet::Util::WindowsPackage
   module SID
     require 'windows/security'
     include ::Windows::Security
@@ -51,9 +51,9 @@ module Puppet::Util::WPackage
       sid_buf = 0.chr * 256
       str_ptr = 0.chr * 4
 
-      raise Puppet::Util::WPackage::Error.new("Invalid SID") unless IsValidSid(psid)
+      raise Puppet::Util::WindowsPackage::Error.new("Invalid SID") unless IsValidSid(psid)
 
-      raise Puppet::Util::WPackage::Error.new("Failed to convert binary SID") unless ConvertSidToStringSid(psid, str_ptr)
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to convert binary SID") unless ConvertSidToStringSid(psid, str_ptr)
 
       begin
         strncpy(sid_buf, str_ptr.unpack('L')[0], sid_buf.size - 1)
@@ -72,7 +72,7 @@ module Puppet::Util::WPackage
       sid_buf = 0.chr * 80
       string_addr = [string].pack('p*').unpack('L')[0]
 
-      raise Puppet::Util::WPackage::Error.new("Failed to convert string SID: #{string}") unless ConvertStringSidToSid(string_addr, sid_buf)
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to convert string SID: #{string}") unless ConvertStringSidToSid(string_addr, sid_buf)
 
       sid_ptr = sid_buf.unpack('L')[0]
       begin
@@ -85,7 +85,7 @@ module Puppet::Util::WPackage
     # Return true if the string is a valid SID, e.g. "S-1-5-32-544", false otherwise.
     def valid_sid?(string)
       string_to_sid_ptr(string) { |ptr| true }
-    rescue Puppet::Util::WPackage::Error => e
+    rescue Puppet::Util::WindowsPackage::Error => e
       if e.code == ERROR_INVALID_SID_STRUCTURE
         false
       else

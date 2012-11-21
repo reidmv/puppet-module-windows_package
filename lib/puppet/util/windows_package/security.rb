@@ -59,7 +59,7 @@
 #   automatically rebuild the access control list based on the new
 #   (and different) owner or group.
 
-require 'puppet/util/wpackage'
+require 'puppet/util/windows_package'
 require 'pathname'
 
 require 'win32/security'
@@ -71,7 +71,7 @@ require 'windows/process'
 require 'windows/memory'
 require 'windows/volume'
 
-module Puppet::Util::WPackage::Security
+module Puppet::Util::WindowsPackage::Security
   include ::Windows::File
   include ::Windows::Handle
   include ::Windows::Security
@@ -80,9 +80,9 @@ module Puppet::Util::WPackage::Security
   include ::Windows::MSVCRT::Buffer
   include ::Windows::Volume
 
-  include Puppet::Util::WPackage::SID
+  include Puppet::Util::WindowsPackage::SID
 
-  extend Puppet::Util::WPackage::Security
+  extend Puppet::Util::WindowsPackage::Security
 
   # file modes
   S_IRUSR = 0000400
@@ -156,7 +156,7 @@ module Puppet::Util::WPackage::Security
     # 'A trailing backslash is required'
     root = "#{root}\\" unless root =~ /[\/\\]$/
     unless GetVolumeInformation(root, nil, 0, nil, nil, flags, nil, 0)
-      raise Puppet::Util::WPackage::Error.new("Failed to get volume information")
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to get volume information")
     end
 
     (flags.unpack('L')[0] & Windows::File::FILE_PERSISTENT_ACLS) != 0
@@ -190,7 +190,7 @@ module Puppet::Util::WPackage::Security
   def get_attributes(path)
     attributes = GetFileAttributes(path)
 
-    raise Puppet::Util::WPackage::Error.new("Failed to get file attributes") if attributes == INVALID_FILE_ATTRIBUTES
+    raise Puppet::Util::WindowsPackage::Error.new("Failed to get file attributes") if attributes == INVALID_FILE_ATTRIBUTES
 
     attributes
   end
@@ -212,7 +212,7 @@ module Puppet::Util::WPackage::Security
   end
 
   def set_attributes(path, flags)
-    raise Puppet::Util::WPackage::Error.new("Failed to set file attributes") unless SetFileAttributes(path, flags)
+    raise Puppet::Util::WindowsPackage::Error.new("Failed to set file attributes") unless SetFileAttributes(path, flags)
   end
 
   MASK_TO_MODE = {
@@ -395,10 +395,10 @@ module Puppet::Util::WPackage::Security
           acl = 0.chr * 1024 # This can be increased later as needed
 
           unless InitializeAcl(acl, acl.size, ACL_REVISION)
-            raise Puppet::Util::WPackage::Error.new("Failed to initialize ACL")
+            raise Puppet::Util::WindowsPackage::Error.new("Failed to initialize ACL")
           end
 
-          raise Puppet::Util::WPackage::Error.new("Invalid DACL") unless IsValidAcl(acl)
+          raise Puppet::Util::WindowsPackage::Error.new("Invalid DACL") unless IsValidAcl(acl)
 
           yield acl
 
@@ -415,20 +415,20 @@ module Puppet::Util::WPackage::Security
 
   def add_access_allowed_ace(acl, mask, sid, inherit = NO_INHERITANCE)
     string_to_sid_ptr(sid) do |sid_ptr|
-      raise Puppet::Util::WPackage::Error.new("Invalid SID") unless IsValidSid(sid_ptr)
+      raise Puppet::Util::WindowsPackage::Error.new("Invalid SID") unless IsValidSid(sid_ptr)
 
       unless AddAccessAllowedAceEx(acl, ACL_REVISION, inherit, mask, sid_ptr)
-        raise Puppet::Util::WPackage::Error.new("Failed to add access control entry")
+        raise Puppet::Util::WindowsPackage::Error.new("Failed to add access control entry")
       end
     end
   end
 
   def add_access_denied_ace(acl, mask, sid)
     string_to_sid_ptr(sid) do |sid_ptr|
-      raise Puppet::Util::WPackage::Error.new("Invalid SID") unless IsValidSid(sid_ptr)
+      raise Puppet::Util::WindowsPackage::Error.new("Invalid SID") unless IsValidSid(sid_ptr)
 
       unless AddAccessDeniedAce(acl, ACL_REVISION, mask, sid_ptr)
-        raise Puppet::Util::WPackage::Error.new("Failed to add access control entry")
+        raise Puppet::Util::WindowsPackage::Error.new("Failed to add access control entry")
       end
     end
   end
@@ -436,7 +436,7 @@ module Puppet::Util::WPackage::Security
   def get_dacl(handle)
     get_dacl_ptr(handle) do |dacl_ptr|
       # REMIND: need to handle NULL DACL
-      raise Puppet::Util::WPackage::Error.new("Invalid DACL") unless IsValidAcl(dacl_ptr)
+      raise Puppet::Util::WindowsPackage::Error.new("Invalid DACL") unless IsValidAcl(dacl_ptr)
 
       # ACL structure, size and count are the important parts. The
       # size includes both the ACL structure and all the ACEs.
@@ -485,7 +485,7 @@ module Puppet::Util::WPackage::Security
         case ace_type
         when ACCESS_ALLOWED_ACE_TYPE
           sid_ptr = ace_ptr.unpack('L')[0] + 8 # address of ace_ptr->SidStart
-          raise Puppet::Util::WPackage::Error.new("Failed to read DACL, invalid SID") unless IsValidSid(sid_ptr)
+          raise Puppet::Util::WindowsPackage::Error.new("Failed to read DACL, invalid SID") unless IsValidSid(sid_ptr)
           sid = sid_ptr_to_string(sid_ptr)
           dacl << {:sid => sid, :type => ace_type, :mask => mask}
         else
@@ -510,7 +510,7 @@ module Puppet::Util::WPackage::Security
          dacl, #dacl
          nil, #sacl
          sd) #sec desc
-    raise Puppet::Util::WPackage::Error.new("Failed to get DACL") unless rv == ERROR_SUCCESS
+    raise Puppet::Util::WindowsPackage::Error.new("Failed to get DACL") unless rv == ERROR_SUCCESS
     begin
       yield dacl.unpack('L')[0]
     ensure
@@ -528,7 +528,7 @@ module Puppet::Util::WPackage::Security
          (info & GROUP_SECURITY_INFORMATION) == GROUP_SECURITY_INFORMATION ? ptr : nil,
          (info & DACL_SECURITY_INFORMATION) == DACL_SECURITY_INFORMATION ? ptr : nil,
          nil)
-    raise Puppet::Util::WPackage::Error.new("Failed to set security information") unless rv == ERROR_SUCCESS
+    raise Puppet::Util::WindowsPackage::Error.new("Failed to set security information") unless rv == ERROR_SUCCESS
   end
 
   # Get the SID string, e.g. "S-1-5-32-544", for the specified handle
@@ -546,7 +546,7 @@ module Puppet::Util::WPackage::Security
          nil, #dacl
          nil, #sacl
          sd) #sec desc
-    raise Puppet::Util::WPackage::Error.new("Failed to get security information") unless rv == ERROR_SUCCESS
+    raise Puppet::Util::WindowsPackage::Error.new("Failed to get security information") unless rv == ERROR_SUCCESS
 
     begin
       return sid_ptr_to_string(sid.unpack('L')[0])
@@ -566,7 +566,7 @@ module Puppet::Util::WPackage::Security
              OPEN_EXISTING,
              FILE_FLAG_BACKUP_SEMANTICS,
              0) # template
-    raise Puppet::Util::WPackage::Error.new("Failed to open '#{path}'") if handle == INVALID_HANDLE_VALUE
+    raise Puppet::Util::WindowsPackage::Error.new("Failed to open '#{path}'") if handle == INVALID_HANDLE_VALUE
     begin
       yield handle
     ensure
@@ -592,14 +592,14 @@ module Puppet::Util::WPackage::Security
 
       # Get the LUID for specified privilege.
       unless LookupPrivilegeValue("", privilege, tmpLuid)
-        raise Puppet::Util::WPackage::Error.new("Failed to lookup privilege")
+        raise Puppet::Util::WindowsPackage::Error.new("Failed to lookup privilege")
       end
 
       # DWORD + [LUID + DWORD]
       tkp = [1].pack('L') + tmpLuid + [enable ? SE_PRIVILEGE_ENABLED : 0].pack('L')
 
       unless AdjustTokenPrivileges(token, 0, tkp, tkp.length , nil, nil)
-        raise Puppet::Util::WPackage::Error.new("Failed to adjust process privileges")
+        raise Puppet::Util::WindowsPackage::Error.new("Failed to adjust process privileges")
       end
     end
   end
@@ -609,7 +609,7 @@ module Puppet::Util::WPackage::Security
     token = 0.chr * 4
 
     unless OpenProcessToken(GetCurrentProcess(), access, token)
-      raise Puppet::Util::WPackage::Error.new("Failed to open process token")
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to open process token")
     end
     begin
       token = token.unpack('L')[0]

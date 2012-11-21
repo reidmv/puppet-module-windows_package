@@ -1,12 +1,12 @@
-require 'puppet/util/wpackage'
+require 'puppet/util/windows_package'
 
-class Puppet::Provider::Package::WPackage
+class Puppet::Provider::Package::WindowsPackage
   class Package
     extend Enumerable
     extend Puppet::Util::Errors
 
-    include Puppet::Util::WPackage::Registry
-    extend Puppet::Util::WPackage::Registry
+    include Puppet::Util::WindowsPackage::Registry
+    extend Puppet::Util::WindowsPackage::Registry
 
     attr_reader :name, :version
 
@@ -40,7 +40,7 @@ class Puppet::Provider::Package::WPackage
                 end
               end
             end
-          rescue Puppet::Util::WPackage::Error => e
+          rescue Puppet::Util::WindowsPackage::Error => e
             raise e unless e.code == Windows::Error::ERROR_FILE_NOT_FOUND
           end
         end
@@ -75,5 +75,5 @@ class Puppet::Provider::Package::WPackage
   end
 end
 
-require 'puppet/provider/wpackage/wpackage/msi_package'
-require 'puppet/provider/wpackage/wpackage/exe_package'
+require 'puppet/provider/windows_package/windows_package/msi_package'
+require 'puppet/provider/windows_package/windows_package/exe_package'

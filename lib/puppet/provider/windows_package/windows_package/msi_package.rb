@@ -1,7 +1,7 @@
-require 'puppet/provider/wpackage/wpackage/package'
+require 'puppet/provider/windows_package/windows_package/package'
 
-class Puppet::Provider::Package::WPackage
-  class MsiPackage < Puppet::Provider::Package::WPackage::Package
+class Puppet::Provider::Package::WindowsPackage
+  class MsiPackage < Puppet::Provider::Package::WindowsPackage::Package
     attr_reader :productcode, :packagecode
 
     # From msi.h

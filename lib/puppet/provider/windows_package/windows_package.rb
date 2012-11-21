@@ -1,8 +1,8 @@
-require 'puppet/provider/wpackage'
-require 'puppet/util/wpackage'
-require 'puppet/provider/wpackage/wpackage/package'
+require 'puppet/provider/windows_package'
+require 'puppet/util/windows_package'
+require 'puppet/provider/windows_package/windows_package/package'
 
-Puppet::Type.type(:wpackage).provide(:wpackage, :parent => Puppet::Provider::WPackage) do
+Puppet::Type.type(:windows_package).provide(:windows_package, :parent => Puppet::Provider::WindowsPackage) do
   desc "Windows package management.
 
     This provider supports either MSI or self-extracting executable installers.
@@ -29,7 +29,7 @@ Puppet::Type.type(:wpackage).provide(:wpackage, :parent => Puppet::Provider::WPa
 
   # Return an array of provider instances
   def self.instances
-    Puppet::Provider::Package::WPackage::Package.map do |pkg|
+    Puppet::Provider::Package::WindowsPackage::Package.map do |pkg|
       provider = new(to_hash(pkg))
       provider.package = pkg
       provider
@@ -42,14 +42,14 @@ Puppet::Type.type(:wpackage).provide(:wpackage, :parent => Puppet::Provider::WPa
       # we're not versionable, so we can't set the ensure
       # parameter to the currently installed version
       :ensure   => :installed,
-      :provider => :wpackage
+      :provider => :windows_package
     }
   end
 
   # Query for the provider hash for the current resource. The provider we
   # are querying, may not have existed during prefetch
   def query
-    Puppet::Provider::Package::WPackage::Package.find do |pkg|
+    Puppet::Provider::Package::WindowsPackage::Package.find do |pkg|
       if pkg.match?(resource)
         return self.class.to_hash(pkg)
       end
@@ -58,7 +58,7 @@ Puppet::Type.type(:wpackage).provide(:wpackage, :parent => Puppet::Provider::WPa
   end
 
   def install
-    installer = Puppet::Provider::Package::WPackage::Package.installer_class(resource)
+    installer = Puppet::Provider::Package::WindowsPackage::Package.installer_class(resource)
 
     command = [installer.install_command(resource), install_options].flatten.compact.join(' ')
     execute(command, :failonfail => false, :combine => true)
@@ -98,7 +98,7 @@ Puppet::Type.type(:wpackage).provide(:wpackage, :parent => Puppet::Provider::WPa
     when ERROR_SUCCESS_REBOOT_REQUIRED
       warning("The package #{operation}ed successfully, but the system must be rebooted.")
     else
-      raise Puppet::Util::WPackage::Error.new("Failed to #{operation}", hr)
+      raise Puppet::Util::WindowsPackage::Error.new("Failed to #{operation}", hr)
     end
   end
 
