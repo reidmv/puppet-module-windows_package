@@ -1,7 +1,7 @@
 require 'puppet/util/windows_package'
 
-require 'win32/security'
 require 'facter'
+require 'win32/security' if Facter.value('osfamily') == 'Windows'
 
 module Puppet::Util::WindowsPackage::User
   include ::Windows::Security

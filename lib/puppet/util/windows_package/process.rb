@@ -1,9 +1,12 @@
+require 'facter'
 require 'puppet/util/windows_package'
 
 module Puppet::Util::WindowsPackage::Process
-  extend ::Windows::Process
-  extend ::Windows::Handle
-  extend ::Windows::Synchronize
+  if Facter.value('osfamily') == 'Windows'
+    extend ::Windows::Process
+    extend ::Windows::Handle
+    extend ::Windows::Synchronize
+  end
 
   def execute(command, arguments, stdin, stdout, stderr)
     Process.create( :command_line => command, :startup_info => {:stdin => stdin, :stdout => stdout, :stderr => stderr}, :close_handles => false )

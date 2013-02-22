@@ -1,19 +1,23 @@
 require 'puppet/util/windows_package'
+require 'facter'
 
 module Puppet::Util::WindowsPackage
   module SID
-    require 'windows/security'
-    include ::Windows::Security
 
-    require 'windows/memory'
-    include ::Windows::Memory
+    if Facter.value('osfamily') == 'Windows'
+      require 'windows/security'
+      include ::Windows::Security
 
-    require 'windows/msvcrt/string'
-    include ::Windows::MSVCRT::String
+      require 'windows/memory'
+      include ::Windows::Memory
+
+      require 'windows/msvcrt/string'
+      include ::Windows::MSVCRT::String
+    end
 
     # missing from Windows::Error
-    ERROR_NONE_MAPPED           = 1332
-    ERROR_INVALID_SID_STRUCTURE = 1337
+    ERROR_NONE_MAPPED           = ERROR_NONE_MAPPED           ||= 1332
+    ERROR_INVALID_SID_STRUCTURE = ERROR_INVALID_SID_STRUCTURE ||= 1337
 
     # Convert an account name, e.g. 'Administrators' into a SID string,
     # e.g. 'S-1-5-32-544'. The name can be specified as 'Administrators',
