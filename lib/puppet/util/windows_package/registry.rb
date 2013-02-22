@@ -1,3 +1,5 @@
+require 'facter'
+if Facter.value('osfamily') == 'windows'
 require 'puppet/util/windows_package'
 
 module Puppet::Util::WindowsPackage
@@ -33,4 +35,5 @@ module Puppet::Util::WindowsPackage
       values
     end
   end
+end
 end

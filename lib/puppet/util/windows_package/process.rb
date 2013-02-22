@@ -1,8 +1,10 @@
 require 'facter'
+if Facter.value('osfamily') == 'windows'
+require 'facter'
 require 'puppet/util/windows_package'
 
 module Puppet::Util::WindowsPackage::Process
-  if Facter.value('osfamily') == 'Windows'
+  if Facter.value('osfamily') == 'windows'
     extend ::Windows::Process
     extend ::Windows::Handle
     extend ::Windows::Synchronize
@@ -33,4 +35,5 @@ module Puppet::Util::WindowsPackage::Process
     exit_status
   end
   module_function :wait_process
+end
 end

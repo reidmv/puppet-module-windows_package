@@ -1,3 +1,5 @@
+require 'facter'
+if Facter.value('osfamily') == 'windows'
 require 'puppet/provider/windows_package'
 require 'puppet/util/windows_package'
 require 'puppet/provider/windows_package/windows_package/package'
@@ -129,4 +131,5 @@ Puppet::Type.type(:windows_package).provide(:windows_package, :parent => Puppet:
       end
     end
   end
+end
 end
