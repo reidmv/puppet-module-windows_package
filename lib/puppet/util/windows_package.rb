@@ -1,3 +1,5 @@
+require 'facter'
+if Facter.value('osfamily') == 'windows'
 module Puppet::Util::WindowsPackage
   if Puppet::Util::Platform.windows?
     # these reference platform specific gems
@@ -9,4 +11,5 @@ module Puppet::Util::WindowsPackage
     require 'puppet/util/windows_package/file'
   end
   require 'puppet/util/windows_package/registry'
+end
 end

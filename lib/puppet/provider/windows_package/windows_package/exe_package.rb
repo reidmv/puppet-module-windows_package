@@ -1,3 +1,5 @@
+require 'facter'
+if Facter.value('osfamily') == 'windows'
 require 'puppet/provider/windows_package/windows_package/package'
 
 class Puppet::Provider::Package::WindowsPackage
@@ -67,4 +69,5 @@ class Puppet::Provider::Package::WindowsPackage
       command
     end
   end
+end
 end
